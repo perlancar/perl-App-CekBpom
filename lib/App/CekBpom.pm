@@ -41,7 +41,12 @@ _
         search_type => {
             schema => ['str*', in=>[sort keys %search_types]],
             default => 'nama_produk',
-            cmdline_aliases => {t=>{}},
+            cmdline_aliases => {
+                t=>{},
+                (
+                    map { my $t = $_; ($t => {is_flag=>1, summary=>"Shortcut for --search-type=$_", code=>sub {$_[0] = $t} }) } keys %search_types,
+                ),
+            },
         },
         query => {
             schema =>  'str*',
