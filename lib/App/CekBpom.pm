@@ -44,7 +44,7 @@ _
             cmdline_aliases => {
                 t=>{},
                 (
-                    map { my $t = $_; ($t => {is_flag=>1, summary=>"Shortcut for --search-type=$_", code=>sub {$_[0] = $t} }) } keys %search_types,
+                    map { my $t = $_; ($t => {is_flag=>1, summary=>"Shortcut for --search-type=$_", code=>sub {$_[0]{search_type} = $t} }) } keys %search_types,
                 ),
             },
         },
