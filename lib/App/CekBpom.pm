@@ -93,7 +93,6 @@ sub cek_bpom {
             return [$res->code, "Can't get result page: ".$res->message];
         }
         my $ct = $res->content;
-        say $ct;
         unless ($ct =~ m!(\d+) - (\d+) Dari (\d+)!) {
             return [543, "Can't find signature in result page"];
         }
@@ -103,19 +102,28 @@ sub cek_bpom {
             redo;
         }
 
+        if ($ENV{CEK_BPOM_TRACE}) {
+            log_trace $ct;
+        }
+
         while ($ct =~ m!
-                           <tr\stitle.+?\surldetil="/(?P<ereg_id>[^"]+)">
-                           <td[^>]*>(?P<nomor_registrasi>[^<]+)(?:</div>)</td> # error html sih
+                           <tr\stitle.+?\surldetil="/(?P<reg_id>[^"]+)">
+                           <td[^>]*>(?P<nomor_registrasi>[^<]+)(?:<div>Terbit: (?P<tanggal_terbit>[^<]+))?</div></td>
                            <td[^>]*>(?P<nama>[^<]+)<div>Merk: (?P<merk>[^<]+)<br>Kemasan: (?P<kemasan>[^<]+)</div></td>
-                           <td[^>]*>(?P<pendaftar>[^<]+)<div>(?P<kota_pendaftar></div></td>
+                           <td[^>]*>(?P<pendaftar>[^<]+)<div>(?P<kota_pendaftar>[^<]+)</div></td>
                        !sgx) {
             push @rows, {%+};
         }
         last;
     }
 
+    if (@rows < $num_results) {
+        # XXX should've been a fatal error
+        log_warn "Some results cannot be parsed (only got %d out of %d)", scalar(@rows), $num_results;
+    }
+
     my %resmeta;
-    $resmeta{'table.fields'} = [qw/ereg_id nomor_registrasi nama merk kemasan pendaftar kota_pendaftar/];
+    $resmeta{'table.fields'} = [qw/reg_id nomor_registrasi tanggal_terbit nama merk kemasan pendaftar kota_pendaftar/];
 
     [200, "OK", \@rows, \%resmeta];
 }
