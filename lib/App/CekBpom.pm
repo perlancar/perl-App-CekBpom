@@ -117,7 +117,9 @@ sub cek_bpom {
                            <td[^>]*>(?P<nama>[^<]+)<div>Merk: (?P<merk>[^<]+)<br>Kemasan: (?P<kemasan>[^<]+)</div></td>
                            <td[^>]*>(?P<pendaftar>[^<]+)<div>(?P<kota_pendaftar>[^<]+)</div></td>
                        !sgx) {
-            push @rows, {%+};
+            my $row = {%+};
+            for (qw/kemasan/) { $row->{$_} =~ s/\R+//g }
+            push @rows, $row;
         }
         last;
     }
