@@ -1,3 +1,9 @@
+0.006   2020-09-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Allow multiple queries and search types (multiple HTTP query
+	  per CLI invocation, results combined and duplicates removed).
+
+
 0.005   2020-09-09  Released-By: PERLANCAR; Urgency: low
 
 	- [ux] Log number of results.
