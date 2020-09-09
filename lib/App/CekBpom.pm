@@ -59,6 +59,19 @@ _
                     } keys %known_search_types,
                 ),
             },
+            description => <<'_',
+
+By default, if not specified, will search against product name ("nama_produk")
+and brand ("merk"). If you specify multiple times, it will search against all
+those types, e.g.:
+
+    --search-type nama_produk --search-type nama_pendaftar
+
+or:
+
+    --nama-produk --nama-pendaftar
+
+_
         },
         queries => {
             'x.name.is_plural' => 1,
