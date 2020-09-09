@@ -1,3 +1,10 @@
+0.007   2020-09-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add examples.
+
+
 0.006   2020-09-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Allow multiple queries and search types (multiple HTTP query
@@ -6,7 +13,9 @@
 
 0.005   2020-09-09  Released-By: PERLANCAR; Urgency: low
 
-	- [ux] Log number of results.
+        - No functional changes.
+
+	- [ux] Log number of results for informative purposes.
 
 
 0.004   2020-09-09  Released-By: PERLANCAR; Urgency: medium
