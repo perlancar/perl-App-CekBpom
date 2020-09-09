@@ -18,14 +18,15 @@ our %SPEC;
 my $url_prefix = "https://cekbpom.pom.go.id/index.php";
 
 my %search_types = (
-    nomor_registrasi => 0,
-    nama_produk => 1,
-    merk => 2,
-    jumlah_dan_kemasan => 3,
-    bentuk_sediaan => 4,
-    komposisi => 5,
-    nama_pendaftar => 6,
-    npwp_pendaftar => 7,
+    # name => [number in bpom website's form, shortcut alias if any]
+    nomor_registrasi => [0],
+    nama_produk => [1, 'n'],
+    merk => [2, 'm'],
+    jumlah_dan_kemasan => [3],
+    bentuk_sediaan => [4],
+    komposisi => [5],
+    nama_pendaftar => [6, 'p'],
+    npwp_pendaftar => [7],
 );
 
 $SPEC{cek_bpom} = {
@@ -44,7 +45,16 @@ _
             cmdline_aliases => {
                 t=>{},
                 (
-                    map { my $t = $_; ($t => {is_flag=>1, summary=>"Shortcut for --search-type=$_", code=>sub {$_[0]{search_type} = $t} }) } keys %search_types,
+                    map {
+                        my $t = $_;
+                        my @aliases;
+                        push @aliases, ($t => {is_flag=>1, summary=>"Shortcut for --search-type=$t", code=>sub {$_[0]{search_type} = $t} });
+                        my $shortcut = $search_types{$t}[1];
+                        if (defined $shortcut) {
+                            push @aliases, ($shortcut => {is_flag=>1, summary=>"Shortcut for --search-type=$t", code=>sub {$_[0]{search_type} = $t} });
+                        }
+                        @aliases;
+                    } keys %search_types,
                 ),
             },
         },
@@ -67,7 +77,7 @@ sub cek_bpom {
         cookie_jar => $jar,
     );
 
-    my $search_type = $search_types{ $args{search_type} // 'nama_produk' };
+    my $search_type = $search_types{ $args{search_type} // 'nama_produk' }[0];
     unless (defined $search_type) {
         return [400, "Unknown search_type '$args{search_type}'"];
     }
