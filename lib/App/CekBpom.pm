@@ -82,6 +82,21 @@ _
             slurpy => 1,
         },
     },
+    examples => [
+        {
+            summary => 'By default search against name (nama_produk) and brand (merk)',
+            argv => ["hichew", "hi-chew", "hi chew"],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Adding --trace will show query details, --format html+datatables is convenient to see/search/sort results in browser',
+            src => "[[prog]] hichew hi-chew 'hi chew' --trace --format html+datatables",
+            src_plang => "bash",
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
 };
 sub cek_bpom {
     require HTTP::CookieJar::LWP;
