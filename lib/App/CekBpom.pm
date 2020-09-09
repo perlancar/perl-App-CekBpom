@@ -40,6 +40,7 @@ HTTP client behavior by setting `LWP_USERAGENT_PLUGINS` environment variable.
 _
     args => {
         search_type => {
+            summary => 'Select what field to search against',
             schema => ['str*', in=>[sort keys %search_types]],
             default => 'nama_produk',
             cmdline_aliases => {
@@ -137,6 +138,8 @@ sub cek_bpom {
     if (@rows < $num_results) {
         # XXX should've been a fatal error
         log_warn "Some results cannot be parsed (only got %d out of %d)", scalar(@rows), $num_results;
+    } else {
+        log_trace "Got $num_results result(s)";
     }
 
     my %resmeta;
