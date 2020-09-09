@@ -1,3 +1,8 @@
+0.005   2020-09-09  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Log number of results.
+
+
 0.004   2020-09-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add shortcut options: -m for --merk, -n for --nama-produk,
