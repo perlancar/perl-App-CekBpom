@@ -196,6 +196,11 @@ sub cek_bpom {
     my %resmeta;
     $resmeta{'table.fields'} = [qw/reg_id nomor_registrasi tanggal_terbit nama merk kemasan pendaftar kota_pendaftar/];
 
+    unless (@all_rows) {
+        $resmeta{'cmdline.result'} = "No results found for ".join(", ", @$queries).
+            " (search types: ".join(", ", @$search_types).". Perhaps try other spelling variations or additional search types.";
+    }
+
     [200, "OK", \@all_rows, \%resmeta];
 }
 
