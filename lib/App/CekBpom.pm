@@ -164,9 +164,9 @@ sub cek_bpom {
 
                 while ($ct =~ m!
                                    <tr\stitle.+?\surldetil="/(?P<reg_id>[^"]+)">
-                                   <td[^>]*>(?P<nomor_registrasi>[^<]+)(?:<div>Terbit:\s*(?P<tanggal_terbit>[^<]+))?</div></td>
-                                   <td[^>]*>(?P<nama>[^<]+)<div>Merk:\s*(?P<merk>[^<]+)<br>Kemasan:\s*(?P<kemasan>[^<]+)</div></td>
-                                   <td[^>]*>(?P<pendaftar>[^<]+)<div>(?P<kota_pendaftar>[^<]+)</div></td>
+                                   <td[^>]*>\s* (?P<nomor_registrasi>[^<]+?)\s*   (?:<div>Terbit:(?P<tanggal_terbit>[^<]+?))?\s*    </div></td>
+                                   <td[^>]*>\s* (?P<nama>[^<]+?)\s*<div>Merk:\s*  (?P<merk>[^<]+)<br>Kemasan:(?P<kemasan>[^<]+?)\s* </div></td>
+                                   <td[^>]*>\s* (?P<pendaftar>[^<]+?)\s*<div>\s*  (?P<kota_pendaftar>[^<]+?)\s*                     </div></td>
                                !sgx) {
                     my $row = {%+};
                     for (qw/kemasan/) { $row->{$_} =~ s/\R+//g }
