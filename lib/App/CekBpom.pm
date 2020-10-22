@@ -6,7 +6,7 @@ package App::CekBpom;
 # VERSION
 
 use 5.010001;
-use strict;
+use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
@@ -277,6 +277,7 @@ sub cek_bpom {
             num_results => scalar @all_rows,
             (note => $args{note}) x !!(exists $args{note}),
             duration => sprintf("%0.3f", $time_after_query-$time_before_query),
+            cek_bpom_version => ${__PACKAGE__.'::VERSION'} || 'dev',
         );
         open my $fh, ">>", $path or do {
             log_error "Can't open query log file '$path': $!, skipped logging query";
