@@ -10,6 +10,8 @@ use strict;
 use warnings;
 use Log::ger;
 
+use Time::HiRes qw(time);
+
 use Exporter qw(import);
 our @EXPORT_OK = qw(cek_bpom);
 
@@ -28,6 +30,12 @@ my %known_search_types = (
     nama_pendaftar => [6, 'p'],
     npwp_pendaftar => [7],
 );
+
+sub _encode {
+    my $str = shift;
+    $str =~ s/[^A-Za-z_0-9-]+/-/g;
+    $str;
+}
 
 $SPEC{cek_bpom} = {
     v => 1.1,
@@ -81,6 +89,59 @@ _
             pos => 0,
             slurpy => 1,
         },
+        note => {
+            summary => 'Add note',
+            schema => 'str*',
+            description => <<'_',
+
+This will not be sent as queries, but will be added to the log file if log file
+is specified, as well as added to the result dump file name, in encoded form.
+
+_
+            tags => ['category:logging'],
+        },
+        query_log_file => {
+            summary => 'Log queries to log file',
+            schema => 'filename*',
+            description => <<'_',
+
+If specified, each invocation of this utility will be logged into a line in the
+specified file path, in TSV format. Tab character in the query will be converted
+into 4 spaces, to avoid clash with the use of Tab as field separator.
+
+For example, this invocation:
+
+    % cek-bpom "minuman susu fermentasi" yakult --query-log-file /some/path.txt
+
+Sample log line:
+
+    time:2020-10-22T01:02:03.000Z    queries:minuman susu fermentasi,yakult    search_types:merk,nama_produk    num_results:51    duration:3.402
+
+_
+            tags => ['category:logging'],
+        },
+        result_dump_dir => {
+            summary => 'Dump result to directory',
+            schema => 'dirname*',
+            description => <<'_',
+
+If specified, will dump full enveloped result to a file in specified directory
+path, in JSON format. The JSON formatting makes it easy to grep each row. The
+file will be named
+`cek-bpom-result.<encoded-timestamp>.<search-types-encoded>.<queries-encoded>(.<note-encoded>)?.json`.
+The encoded timestamp is ISO 8601 format with colon replaced by underscore. The
+encoded query will replace all every group of "unsafe" characters in query with
+a single dash. The same goes with encoded note, which comes from the `note`
+argument. For example, this invocation:
+
+    % cek-bpom "minuman susu fermentasi" yakult --note "some note"
+
+will result in a result dump file name like:
+`cek-bpom-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-susu-fermentasi-yakult.some-note.json`.
+
+_
+            tags => ['category:logging'],
+        },
     },
     examples => [
         {
@@ -101,6 +162,8 @@ _
 sub cek_bpom {
     require HTTP::CookieJar::LWP;
     require LWP::UserAgent::Plugin;
+
+    my $time_start = time();
 
     my %args = @_;
     defined(my $queries = $args{queries}) or return [400, "Please specify queries"];
@@ -126,6 +189,7 @@ sub cek_bpom {
     my %reg_ids;
     my @all_rows;
 
+    my $time_before_query = time();
   QUERY:
     for my $query (@$queries) {
       SEARCH_TYPE:
@@ -188,6 +252,7 @@ sub cek_bpom {
             }
         } # for SEARCH_TYPE
     } # for QUERY
+    my $time_after_query = time();
 
     if (@$search_types > 1 || @$queries > 1) {
         log_trace "Got a total of %d result(s)", scalar(@all_rows);
@@ -201,7 +266,59 @@ sub cek_bpom {
             " (search types: ".join(", ", @$search_types).". Perhaps try other spelling variations or additional search types.";
     }
 
-    [200, "OK", \@all_rows, \%resmeta];
+  LOG_QUERY: {
+        last unless defined(my $path = $args{query_log_file});
+        require Date::Format::ISO8601;
+
+        my %fields = (
+            time => Date::Format::ISO8601::gmtime_to_iso8601_datetime({second_precision=>0}, $time_start),
+            queries => join(",", @$queries),
+            search_types => join(",", @$search_types),
+            num_results => scalar @all_rows,
+            (note => $args{note}) x !!(exists $args{note}),
+            duration => sprintf("%0.3f", $time_after_query-$time_before_query),
+        );
+        open my $fh, ">>", $path or do {
+            log_error "Can't open query log file '$path': $!, skipped logging query";
+            last LOG_QUERY;
+        };
+        my $log_line = join("\t", map { my $key=$_; my $val=$fields{$key}; $val=~s/\R/ /g; $val=~s/\t/    /g; "$key:$val" } sort keys %fields);
+        log_trace "Logging query: $log_line";
+        print $fh $log_line, "\n";
+        close $fh or do {
+            log_error "Can't write log to query log file '$path': $!, ignoring";
+        };
+    }
+
+    my $envres = [200, "OK", \@all_rows, \%resmeta];
+
+  DUMP_RESULT: {
+        last unless defined(my $dir = $args{result_dump_dir});
+        require JSON::Encode::TableData;
+
+        -d $dir or do {
+            log_error "Result dump dir '$dir' does not exist or not a dir, skipped dumping result";
+            last DUMP_RESULT;
+        };
+        my $filename = sprintf(
+            "cek-bpom-result.%s.%s.%s%s.json",
+            Date::Format::ISO8601::gmtime_to_iso8601_datetime({second_precision=>0, time_sep=>"_"}, $time_start),
+            _encode(join ",", @$search_types),
+            _encode(join ",", @$queries),
+            defined $args{note} ? "."._encode($args{note}) : "",
+        );
+        log_trace "Dumping result to $dir/$filename ...";
+        open my $fh, ">", "$dir/$filename" or do {
+            log_error "Can't open '$dir/$filename': $!, skipped dumping result";
+            last DUMP_RESULT;
+        };
+        print $fh JSON::Encode::TableData::encode_json($envres);
+        close $fh or do {
+            log_error "Can't write '$dir/$filename': $!, ignoring";
+        };
+    }
+
+    $envres;
 }
 
 1;
