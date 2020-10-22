@@ -22,12 +22,12 @@ my $url_prefix = "https://cekbpom.pom.go.id/index.php";
 my %known_search_types = (
     # name => [number in bpom website's form, shortcut alias if any]
     nomor_registrasi => [0],
-    nama_produk => [1, 'n'],
+    nama_produk => [1, 'p'],
     merk => [2, 'm'],
     jumlah_dan_kemasan => [3],
     bentuk_sediaan => [4],
     komposisi => [5],
-    nama_pendaftar => [6, 'p'],
+    nama_pendaftar => [6, 'P'],
     npwp_pendaftar => [7],
 );
 
