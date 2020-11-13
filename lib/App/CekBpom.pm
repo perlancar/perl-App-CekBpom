@@ -13,7 +13,7 @@ use Log::ger;
 use Time::HiRes qw(time);
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(cek_bpom);
+our @EXPORT_OK = qw(cek_bpom_products);
 
 our %SPEC;
 
@@ -37,7 +37,7 @@ sub _encode {
     $str;
 }
 
-$SPEC{cek_bpom} = {
+$SPEC{cek_bpom_products} = {
     v => 1.1,
     summary => 'Search BPOM products via https://cekbpom.pom.go.id/',
     description => <<'_',
@@ -134,7 +134,7 @@ into 4 spaces, to avoid clash with the use of Tab as field separator.
 
 For example, this invocation:
 
-    % cek-bpom "minuman susu fermentasi" yakult --query-log-file /some/path.txt
+    % cek-bpom-products "minuman susu fermentasi" yakult --query-log-file /some/path.txt
 
 Sample log line:
 
@@ -151,16 +151,16 @@ _
 If specified, will dump full enveloped result to a file in specified directory
 path, in JSON format. The JSON formatting makes it easy to grep each row. The
 file will be named
-`cek-bpom-result.<encoded-timestamp>.<search-types-encoded>.<queries-encoded>(.<note-encoded>)?.json`.
+`cek-bpom-products-result.<encoded-timestamp>.<search-types-encoded>.<queries-encoded>(.<note-encoded>)?.json`.
 The encoded timestamp is ISO 8601 format with colon replaced by underscore. The
 encoded query will replace all every group of "unsafe" characters in query with
 a single dash. The same goes with encoded note, which comes from the `note`
 argument. For example, this invocation:
 
-    % cek-bpom "minuman susu fermentasi" yakult --note "some note"
+    % cek-bpom-products "minuman susu fermentasi" yakult --note "some note"
 
 will result in a result dump file name like:
-`cek-bpom-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-susu-fermentasi-yakult.some-note.json`.
+`cek-bpom-products-result.2020-10-22T01_02_03.000Z.merk-nama_produk.minuman-susu-fermentasi-yakult.some-note.json`.
 
 _
             tags => ['category:logging'],
@@ -182,7 +182,7 @@ _
         },
     ],
 };
-sub cek_bpom {
+sub cek_bpom_products {
     require HTTP::CookieJar::LWP;
     require LWP::UserAgent::Plugin;
 
@@ -348,7 +348,7 @@ sub cek_bpom {
             last DUMP_RESULT;
         };
         my $filename = sprintf(
-            "cek-bpom-result.%s.%s.%s%s.json",
+            "cek-bpom-products-result.%s.%s.%s%s.json",
             Date::Format::ISO8601::gmtime_to_iso8601_datetime({second_precision=>0, time_sep=>"_"}, $time_start),
             _encode(join ",", @$search_types),
             _encode(join ",", @$queries),
@@ -369,11 +369,11 @@ sub cek_bpom {
 }
 
 1;
-# ABSTRACT: Check BPOM products via the command-line (CLI interface for cekbpom.pom.go.id)
+# ABSTRACT: Check BPOM products/manufacturers ("sarana") via the command-line (CLI interface for cekbpom.pom.go.id)
 
 =head1 DESCRIPTION
 
-See included script L<cek-bpom>.
+See included script L<cek-bpom-products> and L<cek-bpom-manufacturers>.
 
 
 =head1 SEE ALSO
