@@ -317,9 +317,11 @@ sub cek_bpom_products {
         require Date::Format::ISO8601;
 
         my %fields = (
+            what => 'products',
             time => Date::Format::ISO8601::gmtime_to_iso8601_datetime({second_precision=>0}, $time_start),
             queries => join(",", @$queries),
             search_types => join(",", @$search_types),
+            opt_get_product_detail => $args{get_product_detail} ? 1:0,
             num_results => scalar @all_rows,
             (note => $args{note}) x !!(exists $args{note}),
             duration => sprintf("%0.3f", $time_after_query-$time_before_query),
