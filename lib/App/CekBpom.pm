@@ -79,6 +79,15 @@ or:
 
     --nama-produk --nama-pendaftar
 
+Note: the mobile app version allows you to search for products by original
+manufacturer ("produsen") as well, which is not available in the website
+version. The website allows you to search for producers ("sarana") by
+name/address/city/province/country, though, and lets you view what products are
+registered for that producer.
+
+This utility will allow you to fetch the detail of each product, including
+manufacturer (see `--get-product-detail` option).
+
 _
         },
         queries => {
@@ -88,6 +97,20 @@ _
             req => 1,
             pos => 0,
             slurpy => 1,
+        },
+        get_product_detail => {
+            schema => 'bool*',
+            description => <<'_',
+
+For each product (search result), fetch the detail. This currently fetches the
+manufacturer ("produsen"), which is not displayed by the search result page.
+Note that this requires a separate HTTP request for each product so can
+potentially take a long time and might get you banned. Suggestions include: (1)
+searching without this option first to find out the number of results, then
+search again with this option if you need it; (2) use
+<pm:LWP::UserAgent::Plugin::Delay> to throttle your HTTP requests.
+
+_
         },
         note => {
             summary => 'Add note',
@@ -257,6 +280,29 @@ sub cek_bpom {
     if (@$search_types > 1 || @$queries > 1) {
         log_trace "Got a total of %d result(s)", scalar(@all_rows);
     }
+
+  GET_PRODUCT_DETAIL: {
+        last unless $args{get_product_detail};
+        my $i = 0;
+        for my $row (@all_rows) {
+            $i++;
+            log_trace "[%d/%d] Getting product detail for %s (%s) ...",
+                $i, scalar(@all_rows), $row->{reg_id}, $row->{nama};
+            my $res = $ua->get("$url_prefix/home/detil/$session_id/produk/$row->{reg_id}");
+            unless ($res->is_success) {
+                log_warn "Cannot get product detail for $row->{reg_id} ($row->{nama}), skipped";
+                next;
+            }
+            my $ct = $res->content;
+            $ct =~ m!<td[^>]*>Diproduksi Oleh</td><td><a href="[^"]+sarana/[^"]+/id/([^"]+)"[^>]*>([^<]+)</a> - ([^<]+)</td>! or do {
+                log_warn "Cannot get manufacturer detail for $row->{reg_id} ($row->{nama}), skipped";
+            };
+            $row->{sarana_id} = $1;
+            $row->{sarana_nama} = $2;
+            $row->{sarana_negara} = $3;
+            my $session_id = $1;
+        }
+    } # GET_PRODUCT_DETAIL
 
     my %resmeta;
     $resmeta{'table.fields'} = [qw/reg_id nomor_registrasi tanggal_terbit nama merk kemasan pendaftar kota_pendaftar/];
