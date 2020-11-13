@@ -294,7 +294,7 @@ sub cek_bpom_products {
                 next;
             }
             my $ct = $res->content;
-            $ct =~ m!<td[^>]*>Diproduksi Oleh</td><td><a href="[^"]+sarana/[^"]+/id/([^"]+)"[^>]*>([^<]+)</a> - ([^<]+)</td>! or do {
+            $ct =~ m!<td[^>]*>Diproduksi Oleh</td><td><a href="[^"]+sarana/[^"]+/id/([^"]+)"[^>]*>\s*([^<]+?)\s*</a> - ([^<]+?)\s*</td>! or do {
                 log_warn "Cannot get manufacturer detail for $row->{reg_id} ($row->{nama}), skipped";
             };
             $row->{sarana_id} = $1;
@@ -305,7 +305,7 @@ sub cek_bpom_products {
     } # GET_PRODUCT_DETAIL
 
     my %resmeta;
-    $resmeta{'table.fields'} = [qw/reg_id nomor_registrasi tanggal_terbit nama merk kemasan pendaftar kota_pendaftar/];
+    $resmeta{'table.fields'} = [qw/reg_id nomor_registrasi tanggal_terbit nama merk kemasan pendaftar kota_pendaftar sarana_id sarana_nama sarana_negara/];
 
     unless (@all_rows) {
         $resmeta{'cmdline.result'} = "No results found for ".join(", ", @$queries).
