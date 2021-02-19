@@ -1,3 +1,11 @@
+0.013   2021-02-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Edit Changes: rename Backward-Compatible property in
+	  Release Note to Backward-Incompatible.
+
+
 0.012   2020-11-13  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Rename CLI cek-bpom to cek-bpom-products.
