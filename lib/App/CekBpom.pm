@@ -1,16 +1,16 @@
 package App::CekBpom;
 
-# AUTHORITY
-# DATE
-# DIST
-# VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
 use Time::HiRes qw(time);
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(cek_bpom_products);
