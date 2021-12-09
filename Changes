@@ -1,3 +1,8 @@
+0.015   2021-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Set 'title' property in result metadata.
+
+
 0.014   2021-10-01  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli cek-bpom-products] Enable reading config & env.
