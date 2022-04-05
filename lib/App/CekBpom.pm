@@ -352,7 +352,7 @@ sub cek_bpom_products {
         my $filename = sprintf(
             "cek-bpom-products-result.%s.%s.%s%s.json",
             Date::Format::ISO8601::gmtime_to_iso8601_datetime({second_precision=>0, time_sep=>"_"}, $time_start),
-            _encode(join ",", @$search_types),
+            _encode(join ",", @$search_types, ($args{get_product_detail} ? ("product_detail") : ())),
             _encode(join ",", @$queries),
             defined $args{note} ? "."._encode($args{note}) : "",
         );
