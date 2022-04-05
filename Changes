@@ -1,3 +1,10 @@
+0.019   2022-04-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract.
+
+
 0.018   2022-04-05  Released-By: PERLANCAR; Urgency: medium
 
         - Mark the use of --get-product-detail option in filename.
