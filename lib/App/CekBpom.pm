@@ -373,7 +373,7 @@ sub cek_bpom_products {
 }
 
 1;
-# ABSTRACT: Check BPOM products/manufacturers ("sarana") via the command-line (CLI interface for cekbpom.pom.go.id)
+# ABSTRACT: Check registered products & manufacturers (CLIs for cekbpom.pom.go.id)
 
 =head1 DESCRIPTION
 
