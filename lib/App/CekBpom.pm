@@ -367,7 +367,7 @@ sub cek_bpom_products {
         };
     }
 
-    $resmeta{title} = "Check BPOM products: query=[".join(",", @{$args{queries}})."], search_types=[".join(",",@$search_types)."]";
+    $resmeta{caption} = "Check BPOM products: query=[".join(",", @{$args{queries}})."], search_types=[".join(",",@$search_types)."]";
 
     $envres;
 }
