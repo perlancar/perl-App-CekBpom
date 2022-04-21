@@ -1,0 +1,15 @@
+#!perl
+
+use strict;
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+# FRAGMENT id=shcompgen-hint command=cek-bpom-products
+
+exec "cek-bpom-products", "--format=html+datatables", "--trace", @ARGV;
+
+# ABSTRACT: Search BPOM products via https://cekbpom.pom.go.id/, return results in browser
+# PODNAME:
