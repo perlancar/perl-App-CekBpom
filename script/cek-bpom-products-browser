@@ -13,3 +13,9 @@ exec "cek-bpom-products", "--format=html+datatables", "--trace", @ARGV;
 
 # ABSTRACT: Search BPOM products via https://cekbpom.pom.go.id/, return results in browser
 # PODNAME:
+
+=head1 DESCRIPTION
+
+This is a convenience wrapper for L<cek-bpom-products>. It's equivalent to:
+
+ % cek-bpom-products --format=html+datatables --trace ...
